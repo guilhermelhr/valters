@@ -43,7 +43,13 @@ public class ValtersMap {
 		return null;
 	}
 		
-	private ValtersObject[] calculateDepth(ValtersObject[] depthBuffer) {
+	private ValtersObject[] calculateDepth() {
+		ValtersObject[] depthBuffer = new ValtersObject[objects.size];
+		
+		for(int i = 0; i < objects.size; i++) {
+			depthBuffer[i] = objects.get(i);
+		}
+		
 		quickSort(depthBuffer, 0, depthBuffer.length - 1);
 		
 		return depthBuffer;
@@ -55,7 +61,7 @@ public class ValtersMap {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		inBatchRender(batch);
-		for(ValtersObject object : calculateDepth(objects.toArray(ValtersObject.class))) {
+		for(ValtersObject object : calculateDepth()) {
 			object.render(batch);
 		}
 		batch.end();
