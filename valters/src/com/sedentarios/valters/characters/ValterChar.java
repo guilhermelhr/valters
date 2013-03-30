@@ -10,9 +10,10 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.sedentarios.valters.objects.ValtersObject;
 
-public class ValterChar {
-	
+public class ValterChar extends ValtersObject{
+
 	Texture shadow;
 	TextureAtlas walkAtlas;
 	TextureAtlas runAtlas;
@@ -32,8 +33,11 @@ public class ValterChar {
 	int state = 0;
 	
 	Vector2 direction;
-	public Vector2 position;
 	Vector2 speed;
+	
+	public ValterChar(float x, float y) {
+		super("valter", x, y);
+	}
 	
 	public void create() {
 		shadow = new Texture("data/Anim/sombra.png");
@@ -58,7 +62,6 @@ public class ValterChar {
 		runAnim = new Animation(0.06f, runTextures, Animation.LOOP);
 		
 		direction = new Vector2(Vector2.Zero);
-		position = new Vector2(88f, 20f);
 		speed = new Vector2(100f, 50f);
 	}
 	

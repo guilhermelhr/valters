@@ -5,13 +5,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.sedentarios.valters.characters.ValterChar;
 import com.sedentarios.valters.maps.MapEscola;
+import com.sedentarios.valters.objects.ValtersObject;
 
 public class ValtersGame implements ApplicationListener {
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private MapEscola map;
+	ValtersObject valter;
 	
 	@Override
 	public void create() {
@@ -22,9 +23,6 @@ public class ValtersGame implements ApplicationListener {
 		camera.setToOrtho(false, w, h);
 		batch = new SpriteBatch();
 		
-		valter = new ValterChar();
-		valter.create();
-		
 		map = new MapEscola();
 		map.create();
 	}
@@ -32,10 +30,9 @@ public class ValtersGame implements ApplicationListener {
 	@Override
 	public void dispose() {
 		batch.dispose();
-		valter.dispose();
+		map.dispose();
 	}
 	
-	ValterChar valter;
 	@Override
 	public void render() {
 		System.out.println(Gdx.input.getX() + camera.position.x - 1280 / 2);
@@ -44,14 +41,16 @@ public class ValtersGame implements ApplicationListener {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		map.render(camera);
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		valter.render(batch);
-		batch.end();
 		
-		camera.position.set(Math.max(640f, Math.min(2048,(int) valter.position.x)), 190, 0);
+		if(valter != null) {
+			camera.position.set(Math.max(640f, Math.min(2048,(int) valter.getPosition().x)), 190, 0);
+		}else {
+			valter = map.getObject("valter");
+		}
 		
 		camera.update();
+		
+		map.postUpdate();
 	}
 
 	@Override

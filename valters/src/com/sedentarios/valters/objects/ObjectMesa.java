@@ -4,10 +4,14 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class ObjectMesa {
+public class ObjectMesa extends ValtersObject{
 
 	Texture texture;
 	float scale = 0.73f;
+	
+	public ObjectMesa(float x, float y) {
+		super("mesa", x, y);
+	}
 	
 	public void create() {
 		texture = new Texture("data/Objs/mesa.png");
@@ -19,7 +23,7 @@ public class ObjectMesa {
 	}
 	
 	public void render(SpriteBatch batch) {
-		batch.draw(texture, 1120, 30, texture.getWidth() * scale, texture.getHeight() * scale);
+		batch.draw(texture, getPosition().x, getPosition().y, texture.getWidth() * scale, texture.getHeight() * scale);
 	}
 
 }
