@@ -17,10 +17,15 @@ public class ValtersMap {
 	private Array<ValtersObject> objects;
 	private Array<ValtersObject> toBeRemoved;
 	
+	protected int leftCap = 16, rightCap = 360;
+	
 	public ValtersMap() {
 		objects = new Array<ValtersObject>();
 		toBeRemoved = new Array<ValtersObject>();
 		batch = new SpriteBatch();
+	}
+	
+	public void create(){
 	}
 	
 	public void addObject(ValtersObject object) {
@@ -56,8 +61,10 @@ public class ValtersMap {
 	}
 	
 	public void render(OrthographicCamera camera) {
-		renderer.setView(camera);
-		renderer.render();
+		if(renderer != null){
+			renderer.setView(camera);
+			renderer.render();
+		}
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		inBatchRender(batch);
@@ -78,6 +85,14 @@ public class ValtersMap {
 		toBeRemoved.clear();
 	}
 	
+	public int getLeftCap() {
+		return leftCap;
+	}
+
+	public int getRightCap() {
+		return rightCap;
+	}
+
 	public void dispose() {
 		toBeRemoved.clear();
 		for(ValtersObject object : objects) {

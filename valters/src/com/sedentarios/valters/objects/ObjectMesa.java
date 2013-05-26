@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class ObjectMesa extends ValtersObject{
 
 	Texture texture;
-	float scale = 0.73f;
+	float scale = 1.25f;
 	
 	public ObjectMesa(float x, float y) {
 		super("mesa", x, y);

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.sedentarios.valters.ValtersGame;
 import com.sedentarios.valters.objects.ValtersObject;
 
 public class ValterChar extends ValtersObject{
@@ -43,18 +44,22 @@ public class ValterChar extends ValtersObject{
 		shadow = new Texture("data/Anim/sombra.png");
 		
 		idleTexture = new Texture("data/Anim/parado.png");
+		idleTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		walkAtlas = new TextureAtlas("data/Anim/andar/andar_pack.txt");		
 		walkTextures = new Array<TextureRegion>();
 		
 		runAtlas = new TextureAtlas("data/Anim/correr/correr_pack.txt");		
 		runTextures = new Array<TextureRegion>();
 		
-		for(int i = 10; i <= 30; i++) {
-			TextureRegion walkRegion = walkAtlas.findRegion("andar00" + i);
-			walkRegion.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+		for(int i = 6; i <= 25; i++) {
+			TextureRegion walkRegion = walkAtlas.findRegion(i >= 10?("andar00" + i):("andar000" + i));
+			walkRegion.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			walkTextures.add(walkRegion);
+		}
+		
+		for(int i = 12; i <= 28; i++){
 			TextureRegion runRegion = runAtlas.findRegion("correr00" + i);
-			runRegion.getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+			runRegion.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			runTextures.add(runRegion);
 		}
 		
@@ -62,37 +67,37 @@ public class ValterChar extends ValtersObject{
 		runAnim = new Animation(0.06f, runTextures, Animation.LOOP);
 		
 		direction = new Vector2(Vector2.Zero);
-		speed = new Vector2(100f, 50f);
+		speed = new Vector2(200f, 100f);
 	}
 	
 	
 	public void render(SpriteBatch batch) {		
 		direction.set(Vector2.Zero);
-		if(Gdx.input.isKeyPressed(Keys.A)) {
+		if(Gdx.input.isKeyPressed(Keys.A) || ValtersGame.controller.getAxis(1) == -1f) {
 			direction.add(-1 * Gdx.graphics.getDeltaTime(), 0);
 		}
-		if(Gdx.input.isKeyPressed(Keys.D)) {
+		if(Gdx.input.isKeyPressed(Keys.D) || ValtersGame.controller.getAxis(1) == 1f){
 			direction.add(1 * Gdx.graphics.getDeltaTime(), 0);
 		}
 		
-		if(Gdx.input.isKeyPressed(Keys.W)) {
+		if(Gdx.input.isKeyPressed(Keys.W) || ValtersGame.controller.getAxis(0) == -1f) {
 			direction.add(0, 1 * Gdx.graphics.getDeltaTime());
 		}
-		if(Gdx.input.isKeyPressed(Keys.S)) {
+		if(Gdx.input.isKeyPressed(Keys.S) || ValtersGame.controller.getAxis(0) == 1f) {
 			direction.add(0, -1 * Gdx.graphics.getDeltaTime());
 		}
 		
-		boolean run = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT);
+		boolean run = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || ValtersGame.controller.getButton(1);
 		
 		position.add(direction.x * speed.x * (run?2f:1), direction.y * speed.y);
-		if(position.x < 32 || position.x > 2655) {
-			state = position.x < 32?IDLE_L:IDLE_R;
-			position.x = position.x < 32? 32 : 2655;
+		if(position.x < ValtersGame.map.getLeftCap() || position.x > ValtersGame.map.getRightCap()) {
+			state = position.x <= ValtersGame.map.getLeftCap()?IDLE_L:IDLE_R;
+			position.x = position.x <= ValtersGame.map.getLeftCap()? ValtersGame.map.getLeftCap() : ValtersGame.map.getRightCap();
 			direction.set(Vector2.Zero);
 		}
 		
-		if(position.y < 10 || position.y > 70) {
-			position.y = position.y < 15?10:70;
+		if(position.y < 10 || position.y > 140) {
+			position.y = position.y < 15?10:140;
 		}
 		
 		if(direction.len() == 0 && !(state == IDLE_R || state == IDLE_L)){
@@ -113,15 +118,15 @@ public class ValterChar extends ValtersObject{
 			}
 		}
 		
-		batch.draw(shadow, position.x - (shadow.getWidth() / 2), position.y - 5);
+		batch.draw(shadow, position.x - (shadow.getWidth() / 2), position.y - 18);
 		
 		if(state != IDLE_L && state != IDLE_R) {
 			animTime += Gdx.graphics.getDeltaTime();
 		}else {			
 			if(state == IDLE_R) {
-				batch.draw(idleTexture, (int) (position.x - (idleTexture.getWidth() / 2)), position.y);
+				batch.draw(idleTexture, (int) (position.x - (idleTexture.getWidth() / 2) + 24), position.y - 8);
 			}else {
-				batch.draw(idleTexture, (int) (position.x + (idleTexture.getWidth() / 2)), position.y, -idleTexture.getWidth(), idleTexture.getHeight());
+				batch.draw(idleTexture, (int) (position.x + (idleTexture.getWidth() / 2) - 24), position.y - 8, -idleTexture.getWidth(), idleTexture.getHeight());
 			}
 		}
 		

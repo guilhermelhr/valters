@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="data"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="src" exported="true" path="/valters" combineaccessrules="false"/>
-	<classpathentry kind="output" path="bin/classes"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/valters"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry kind="lib" exported="true" path="/valters/libs/gdx.jar" sourcepath="/valters/libs/gdx-sources.jar"/>
-	<classpathentry kind="lib" exported="true" path="libs/gdx-backend-android.jar" sourcepath="libs/gdx-backend-android-sources.jar"/>
-	<classpathentry kind="lib" exported="true" path="/valters/libs/tween-engine-api.jar" sourcepath="/valters/libs/tween-engine-api-sources.jar"/>
-	<classpathentry kind="lib" exported="true" path="/valters/libs/bodyeditor-loader.jar" sourcepath="/valters/libs/bodyeditor-loader-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/valters/libs/gdx.jar" sourcepath="/valters/libs/gdx-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/gdx-backend-android.jar" sourcepath="libs/gdx-backend-android-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/valters/libs/tween-engine-api.jar" sourcepath="/valters/libs/tween-engine-api-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/valters/libs/bodyeditor-loader.jar" sourcepath="/valters/libs/bodyeditor-loader-sources.jar"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry exported="true" kind="lib" path="libs/gdx-controllers-android.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/gdx-controllers.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
