@@ -2,6 +2,7 @@ package com.sedentarios.valters.maps;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -72,7 +73,7 @@ public class MapWarp extends ValtersMap{
 				if(!abrePortaPlayed){
 					abrePortaPlayed = true;
 					portaSound.play();
-				}else if(getRuntime() >= 3f && portalLoaded){	
+				}else if(getRuntime() >= 3f && portalLoaded){
 					stage++;
 					portalSound.play();
 				}
@@ -85,9 +86,15 @@ public class MapWarp extends ValtersMap{
 						currFrame++;
 						frameExposure = 0f;
 					}else{
-						dispose();
-						finished = true;
-						ValtersGame.changeMap(new MapRuaNY());
+						if(stage == 1){
+							Gdx.gl.glClearColor(0, 0, 0, 1);
+							Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+							stage++;
+						}else{
+							dispose();
+							finished = true;
+							ValtersGame.changeMap(new MapRuaNY());
+						}
 					}
 				}
 			}

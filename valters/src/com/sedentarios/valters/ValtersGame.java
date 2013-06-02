@@ -10,7 +10,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.sedentarios.valters.maps.MapEscola;
+import com.sedentarios.valters.maps.MapRuaNY;
 import com.sedentarios.valters.maps.ValtersMap;
 import com.sedentarios.valters.objects.ObjectAccessor;
 import com.sedentarios.valters.objects.ValtersObject;
@@ -39,8 +39,8 @@ public class ValtersGame implements ApplicationListener {
 		
 		ControllerWrapper.bindAxisToInput(-1, "up");
 		ControllerWrapper.bindAxisToInput(1, "down");
-		ControllerWrapper.bindAxisToInput(-2, "right");
-		ControllerWrapper.bindAxisToInput(2, "left");
+		ControllerWrapper.bindAxisToInput(2, "right");
+		ControllerWrapper.bindAxisToInput(-2, "left");
 		
 		ControllerWrapper.bindButtonToInput(0, "action");
 		ControllerWrapper.bindButtonToInput(1, "run");
@@ -53,8 +53,8 @@ public class ValtersGame implements ApplicationListener {
 		ControllerWrapper.bindKeyToInput(Keys.E, "action");
 		ControllerWrapper.bindKeyToInput(Keys.SHIFT_LEFT, "run");
 		
-		changeMap(new MapEscola());
-		//changeMap(new MapRuaNY());
+		//changeMap(new MapEscola());
+		changeMap(new MapRuaNY());
 	}
 	
 	public static void clearStage(){	

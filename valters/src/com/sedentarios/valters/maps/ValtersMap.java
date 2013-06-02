@@ -90,6 +90,9 @@ public abstract class ValtersMap {
 		for(Array<ValtersObject> layer : layers){
 			for(ValtersObject object : calculateDepth(layer)) {
 				object.render(batch);
+				if(object.isWaitingRemoval()){
+					removeObject(object);
+				}
 			}
 		}
 		batch.end();
@@ -99,13 +102,14 @@ public abstract class ValtersMap {
 	
 	protected void inBatchRender(OrthographicCamera camera, SpriteBatch batch) {}
 	
-	public void postUpdate() {
+	public void postUpdate() {		
 		for(ValtersObject object : toBeRemoved) {
 			object.dispose();
 			for(Array<ValtersObject> layer : layers){
 				layer.removeValue(object, false);
 			}
-			Gdx.app.log("Object Processor", "Object " + object.hashCode() + " was removed");
+			Gdx.app.log("Object Processor", "Object " + object.getName() + 
+					"[" + object.hashCode() + "@layer" + object.getLayer() + "] was removed");
 		}
 		toBeRemoved.clear();
 		
