@@ -10,11 +10,11 @@ public class ObjectMesa extends ValtersObject{
 	float scale = 1.25f;
 	
 	public ObjectMesa(float x, float y) {
-		super("mesa", x, y);
+		super("mesa", x, y, (byte) 0);
 	}
 	
 	public void create() {
-		texture = new Texture("data/Objs/mesa.png");
+		texture = new Texture("assets/Objs/mesa.png");
 		texture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 	}
 	

@@ -1,35 +1,48 @@
 package com.sedentarios.valters.maps;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
+import com.sedentarios.valters.ValtersGame;
 import com.sedentarios.valters.objects.ValtersObject;
 
-public class ValtersMap {
+public abstract class ValtersMap {
 	
 	TiledMap map;
 	OrthogonalTiledMapRenderer renderer;
-	SpriteBatch batch;
+	protected SpriteBatch batch;
 	
-	private Array<ValtersObject> objects;
+	private Array<Array<ValtersObject>> layers;
 	private Array<ValtersObject> toBeRemoved;
 	
-	protected int leftCap = 16, rightCap = 360;
+	protected int leftCap, rightCap;
 	
-	public ValtersMap() {
-		objects = new Array<ValtersObject>();
+	public boolean disposed = false;
+	
+	public static final byte LAYERS = 3; 
+	
+	private float runtime = 0f;
+	
+	public ValtersMap(int leftCap, int rightCap) {
+		layers = new Array<Array<ValtersObject>>();
+		for(int i = 0; i < LAYERS; i++){
+			layers.add(new Array<ValtersObject>());
+		}
 		toBeRemoved = new Array<ValtersObject>();
 		batch = new SpriteBatch();
+		this.leftCap = leftCap;
+		this.rightCap = rightCap;
 	}
 	
-	public void create(){
-	}
+	public abstract void create();
+	public abstract void createObjects();
 	
 	public void addObject(ValtersObject object) {
-		objects.add(object);
+		layers.get(object.getLayer()).add(object);
 		object.create();
 	}
 	
@@ -40,15 +53,17 @@ public class ValtersMap {
 	}
 	
 	public ValtersObject getObject(String name) {
-		for(ValtersObject object : objects) {
-			if(object.getName().equals(name)) {
-				return object;
+		for(Array<ValtersObject> objects : layers){
+			for(ValtersObject object : objects) {
+				if(object.getName().equals(name)) {
+					return object;
+				}
 			}
 		}
 		return null;
 	}
 		
-	private ValtersObject[] calculateDepth() {
+	private ValtersObject[] calculateDepth(Array<ValtersObject> objects) {
 		ValtersObject[] depthBuffer = new ValtersObject[objects.size];
 		
 		for(int i = 0; i < objects.size; i++) {
@@ -61,28 +76,45 @@ public class ValtersMap {
 	}
 	
 	public void render(OrthographicCamera camera) {
+		runtime += Gdx.graphics.getDeltaTime();
+		batch.begin();
+		preMapRender(camera, batch);
+		batch.end();
 		if(renderer != null){
 			renderer.setView(camera);
 			renderer.render();
 		}
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		inBatchRender(batch);
-		for(ValtersObject object : calculateDepth()) {
-			object.render(batch);
+		inBatchRender(camera, batch);
+		for(Array<ValtersObject> layer : layers){
+			for(ValtersObject object : calculateDepth(layer)) {
+				object.render(batch);
+			}
 		}
 		batch.end();
 	}
 	
-	protected void inBatchRender(SpriteBatch batch) {}
+	protected void preMapRender(OrthographicCamera camera, SpriteBatch batch){}
+	
+	protected void inBatchRender(OrthographicCamera camera, SpriteBatch batch) {}
 	
 	public void postUpdate() {
 		for(ValtersObject object : toBeRemoved) {
 			object.dispose();
-			objects.removeValue(object, false);
+			for(Array<ValtersObject> layer : layers){
+				layer.removeValue(object, false);
+			}
 			Gdx.app.log("Object Processor", "Object " + object.hashCode() + " was removed");
 		}
 		toBeRemoved.clear();
+		
+		if(Gdx.input.isKeyPressed(Keys.R)){
+			clearObjects();
+			ValtersGame.valter = null;
+			createObjects();
+			System.out.println("Objects recreated");
+		}
 	}
 	
 	public int getLeftCap() {
@@ -92,19 +124,34 @@ public class ValtersMap {
 	public int getRightCap() {
 		return rightCap;
 	}
+	
+	public float getRuntime(){
+		return runtime;
+	}
+	
+	private void clearObjects() {
+		toBeRemoved.clear();
+		for(Array<ValtersObject> layer : layers){
+			for(ValtersObject object : layer) {
+				object.dispose();
+			}
+		}
+		for(Array<ValtersObject> layer : layers){
+			layer.clear();		
+		}
+	}
 
 	public void dispose() {
-		toBeRemoved.clear();
-		for(ValtersObject object : objects) {
-			object.dispose();
-		}
-		objects.clear();
+		clearObjects();
 		toBeRemoved = null;
-		objects = null;
+		layers.clear();
+		layers = null;
 		
-		map.dispose();
-		renderer.dispose();
-		batch.dispose();
+		if(map != null) map.dispose();
+		if(renderer != null) renderer.dispose();
+		if(batch != null) batch.dispose();
+		
+		disposed = true;
 	}
 	
 	public static void quickSort(ValtersObject[] v, int inicio, int fim){

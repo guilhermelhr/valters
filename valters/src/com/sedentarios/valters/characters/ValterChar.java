@@ -1,7 +1,6 @@
 package com.sedentarios.valters.characters;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.sedentarios.valters.ControllerWrapper;
 import com.sedentarios.valters.ValtersGame;
 import com.sedentarios.valters.objects.ValtersObject;
 
@@ -31,24 +31,44 @@ public class ValterChar extends ValtersObject{
 	final int WALKING_L = 3;
 	final int RUNNING_R = 4;
 	final int RUNNING_L = 5;
+	
 	int state = 0;
+	float scale = 1f; 
+	
+	int minY = 10, maxY = 140;
 	
 	Vector2 direction;
 	Vector2 speed;
+	
+	public ValterChar(float x, float y, int minY, int maxY, float scale){
+		this(x, y, minY, maxY);
+		this.scale = scale;
+	}
+	
+	public ValterChar(float x, float y, int minY, int maxY){
+		this(x, y);
+		this.minY = minY;
+		this.maxY = maxY;
+	}
+	
+	public ValterChar(float x, float y, float scale){
+		this(x, y);
+		this.scale = scale;
+	}
 	
 	public ValterChar(float x, float y) {
 		super("valter", x, y);
 	}
 	
 	public void create() {
-		shadow = new Texture("data/Anim/sombra.png");
+		shadow = new Texture("assets/Anim/sombra.png");
 		
-		idleTexture = new Texture("data/Anim/parado.png");
+		idleTexture = new Texture("assets/Anim/parado.png");
 		idleTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		walkAtlas = new TextureAtlas("data/Anim/andar/andar_pack.txt");		
+		walkAtlas = new TextureAtlas("assets/Anim/andar/andar_pack.txt");		
 		walkTextures = new Array<TextureRegion>();
 		
-		runAtlas = new TextureAtlas("data/Anim/correr/correr_pack.txt");		
+		runAtlas = new TextureAtlas("assets/Anim/correr/correr_pack.txt");		
 		runTextures = new Array<TextureRegion>();
 		
 		for(int i = 6; i <= 25; i++) {
@@ -73,31 +93,31 @@ public class ValterChar extends ValtersObject{
 	
 	public void render(SpriteBatch batch) {		
 		direction.set(Vector2.Zero);
-		if(Gdx.input.isKeyPressed(Keys.A) || ValtersGame.controller.getAxis(1) == -1f) {
+		if(ControllerWrapper.isInputActive("left")) {
 			direction.add(-1 * Gdx.graphics.getDeltaTime(), 0);
 		}
-		if(Gdx.input.isKeyPressed(Keys.D) || ValtersGame.controller.getAxis(1) == 1f){
+		if(ControllerWrapper.isInputActive("right")) {
 			direction.add(1 * Gdx.graphics.getDeltaTime(), 0);
 		}
 		
-		if(Gdx.input.isKeyPressed(Keys.W) || ValtersGame.controller.getAxis(0) == -1f) {
+		if(ControllerWrapper.isInputActive("up")) {
 			direction.add(0, 1 * Gdx.graphics.getDeltaTime());
 		}
-		if(Gdx.input.isKeyPressed(Keys.S) || ValtersGame.controller.getAxis(0) == 1f) {
+		if(ControllerWrapper.isInputActive("down")) {
 			direction.add(0, -1 * Gdx.graphics.getDeltaTime());
 		}
 		
-		boolean run = Gdx.input.isKeyPressed(Keys.SHIFT_LEFT) || ValtersGame.controller.getButton(1);
+		boolean run = ControllerWrapper.isInputActive("run");
 		
 		position.add(direction.x * speed.x * (run?2f:1), direction.y * speed.y);
-		if(position.x < ValtersGame.map.getLeftCap() || position.x > ValtersGame.map.getRightCap()) {
+		if(position.x < ValtersGame.map.getLeftCap() || position.x > ValtersGame.map.getRightCap() + Gdx.graphics.getWidth() / 2 - 64) {
 			state = position.x <= ValtersGame.map.getLeftCap()?IDLE_L:IDLE_R;
-			position.x = position.x <= ValtersGame.map.getLeftCap()? ValtersGame.map.getLeftCap() : ValtersGame.map.getRightCap();
+			position.x = position.x <= ValtersGame.map.getLeftCap()? ValtersGame.map.getLeftCap() : ValtersGame.map.getRightCap() + Gdx.graphics.getWidth() / 2 - 64;
 			direction.set(Vector2.Zero);
 		}
 		
-		if(position.y < 10 || position.y > 140) {
-			position.y = position.y < 15?10:140;
+		if(position.y < minY || position.y > maxY) {
+			position.y = position.y < minY + 5?minY:maxY;
 		}
 		
 		if(direction.len() == 0 && !(state == IDLE_R || state == IDLE_L)){
@@ -118,30 +138,30 @@ public class ValterChar extends ValtersObject{
 			}
 		}
 		
-		batch.draw(shadow, position.x - (shadow.getWidth() / 2), position.y - 18);
+		batch.draw(shadow, position.x - (shadow.getWidth() * scale / 2), position.y - 18, shadow.getWidth() * scale, shadow.getHeight() * scale);
 		
 		if(state != IDLE_L && state != IDLE_R) {
 			animTime += Gdx.graphics.getDeltaTime();
 		}else {			
 			if(state == IDLE_R) {
-				batch.draw(idleTexture, (int) (position.x - (idleTexture.getWidth() / 2) + 24), position.y - 8);
+				batch.draw(idleTexture, (int) (position.x - (idleTexture.getWidth() * scale / 2) + 24), position.y - 8, idleTexture.getWidth() * scale, idleTexture.getHeight() * scale);
 			}else {
-				batch.draw(idleTexture, (int) (position.x + (idleTexture.getWidth() / 2) - 24), position.y - 8, -idleTexture.getWidth(), idleTexture.getHeight());
+				batch.draw(idleTexture, (int) (position.x + (idleTexture.getWidth() * scale / 2) - 24), position.y - 8, -idleTexture.getWidth() * scale, idleTexture.getHeight() * scale);
 			}
 		}
 		
 		if(state == WALKING_R) {
 			TextureRegion tr = walkAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x - (tr.getRegionWidth() / 2)), position.y);
+			batch.draw(tr, (int) (position.x - (tr.getRegionWidth() * scale / 2)), position.y, tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}else if(state == WALKING_L) {
 			TextureRegion tr = walkAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x + (tr.getRegionWidth() / 2)), position.y, -tr.getRegionWidth(), tr.getRegionHeight());
+			batch.draw(tr, (int) (position.x + (tr.getRegionWidth() * scale / 2)), position.y, -tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}else if(state == RUNNING_R) {
 			TextureRegion tr = runAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x - (tr.getRegionWidth() / 2)), position.y);
+			batch.draw(tr, (int) (position.x - (tr.getRegionWidth() * scale / 2)), position.y, tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}else if(state == RUNNING_L) {
 			TextureRegion tr = runAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x + (tr.getRegionWidth() / 2)), position.y, -tr.getRegionWidth(), tr.getRegionHeight());
+			batch.draw(tr, (int) (position.x + (tr.getRegionWidth() * scale / 2)), position.y, -tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}
 	}
 	
