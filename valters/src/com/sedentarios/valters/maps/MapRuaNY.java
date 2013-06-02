@@ -28,6 +28,7 @@ public class MapRuaNY extends ValtersMap{
 	public static BitmapFont font = new BitmapFont();
 	private Sound backgroundMusic;
 	//private Sound crowdNoise;
+	private Texture[] noise;
 
 	public MapRuaNY(){
 		super(64,5638);
@@ -48,6 +49,11 @@ public class MapRuaNY extends ValtersMap{
 		background = new Texture("assets/Maps/fundo-parallax_1.png");
 		backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("assets/Music/jazz_bg.wav"));
 		backgroundMusic.loop(0.3f);
+		
+		noise = new Texture[3];
+		for(int i = 0; i < noise.length; i++){
+			noise[i] = new Texture("assets/Ruido/ruido" + (i + 1) + ".png");
+		}
 		//crowdNoise = Gdx.audio.newSound(Gdx.files.internal("assets/Sounds/"));
 	}
 	
@@ -85,9 +91,25 @@ public class MapRuaNY extends ValtersMap{
 		background.dispose();
 	}
 	
+	private float fps = 1f/24f;
+	private byte currFrame = 0;
+	private float exposure = 0f;
 	@Override
 	public void render(OrthographicCamera camera){
 		super.render(camera);
+		exposure += Gdx.graphics.getDeltaTime();
+		if(exposure >= fps){
+			exposure = 0f;
+			currFrame++;
+			if(currFrame > noise.length - 1){
+				currFrame = 0;
+			}
+		}
+	}
+	
+	@Override
+	protected void postObjectRender(OrthographicCamera camera, SpriteBatch batch){
+		//batch.draw(noise[currFrame], 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 	
 	@Override

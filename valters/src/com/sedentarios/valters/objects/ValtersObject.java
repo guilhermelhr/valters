@@ -1,6 +1,7 @@
 package com.sedentarios.valters.objects;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class ValtersObject{
@@ -16,6 +17,8 @@ public abstract class ValtersObject{
 	
 	private float width, height;
 	
+	private CollisionComponent collision;
+	
 	public ValtersObject(String name, Vector2 position) {
 		this.name = name;
 		this.position = position;
@@ -29,6 +32,11 @@ public abstract class ValtersObject{
 	public ValtersObject(String name, float x, float y, byte layer){
 		this(name, x, y);
 		this.layer = layer;
+	}
+	
+	public ValtersObject(String name, float x, float y, byte layer, boolean collidable){
+		this(name, x, y, layer);
+		if(collidable) collision = new CollisionComponent(getCollider());
 	}
 	
 	public abstract void create();
@@ -95,6 +103,14 @@ public abstract class ValtersObject{
 	
 	public void setEnabled(boolean enabled){
 		this.enabled = enabled;
+	}
+	
+	public CollisionComponent getCollisionComponent() {
+		return collision;
+	}
+	
+	public Rectangle getCollider(){
+		return null;
 	}
 
 }

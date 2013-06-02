@@ -95,8 +95,11 @@ public abstract class ValtersMap {
 				}
 			}
 		}
+		postObjectRender(camera, batch);
 		batch.end();
 	}
+	
+	protected void postObjectRender(OrthographicCamera camera, SpriteBatch batch){}
 	
 	protected void preMapRender(OrthographicCamera camera, SpriteBatch batch){}
 	
