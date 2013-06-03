@@ -3,6 +3,7 @@ package com.sedentarios.valters.objects;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.sedentarios.valters.ControllerWrapper;
 import com.sedentarios.valters.ControllerWrapper.Controller;
 import com.sedentarios.valters.ValtersGame;
@@ -22,6 +23,7 @@ public class ObjectJornal extends ValtersObject {
 		sprite = new Texture("assets/Objs/jornal.png");
 		sprite.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		setSize(sprite.getWidth() * scale, sprite.getHeight() * scale);
+		super.create();
 	}
 
 	@Override
@@ -43,6 +45,11 @@ public class ObjectJornal extends ValtersObject {
 			}
 				
 		}
+	}
+	
+	@Override
+	public Rectangle getCollider(){
+		return new Rectangle(position.x, position.y, sprite.getWidth() * scale, sprite.getHeight() * scale);
 	}
 
 }

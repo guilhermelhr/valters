@@ -77,7 +77,7 @@ public class MapRuaNY extends ValtersMap{
 						@Override
 						public void onEvent(int type, BaseTween<?> source) {
 							removeObject(fallingValter);
-							addObject(ValtersGame.valter = new ValterChar(380, 250, 200, 280, 0.8f));
+							addObject(ValtersGame.valter = new ValterChar(325, 250, 200, 280, 0.8f));
 						}
 					}
 				)).start(ValtersGame.tweenManager);
@@ -91,7 +91,7 @@ public class MapRuaNY extends ValtersMap{
 		background.dispose();
 	}
 	
-	private float fps = 1f/24f;
+	private float fps = 1f/19f;
 	private byte currFrame = 0;
 	private float exposure = 0f;
 	@Override
@@ -109,7 +109,8 @@ public class MapRuaNY extends ValtersMap{
 	
 	@Override
 	protected void postObjectRender(OrthographicCamera camera, SpriteBatch batch){
-		//batch.draw(noise[currFrame], 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		batch.draw(noise[currFrame], camera.position.x - Gdx.graphics.getWidth() / 2,
+				camera.position.y - Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 	
 	@Override

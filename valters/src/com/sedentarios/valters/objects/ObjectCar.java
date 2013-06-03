@@ -67,7 +67,6 @@ public class ObjectCar extends ValtersObject {
 			color[0] = rand;
 			color[1] = rand;
 			color[2] = rand;
-			System.out.println(color[0]);
 		}
 		
 		

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.sedentarios.valters.ControllerWrapper;
@@ -57,7 +58,7 @@ public class ValterChar extends ValtersObject{
 	}
 	
 	public ValterChar(float x, float y) {
-		super("valter", x, y);
+		super("valter", x, y, (byte) 1, true);
 	}
 	
 	public void create() {
@@ -88,6 +89,8 @@ public class ValterChar extends ValtersObject{
 		
 		direction = new Vector2(Vector2.Zero);
 		speed = new Vector2(200f, 100f);
+		
+		super.create();
 	}
 	
 	
@@ -109,7 +112,10 @@ public class ValterChar extends ValtersObject{
 		
 		boolean run = ControllerWrapper.isInputActive("run");
 		
-		position.add(direction.x * speed.x * (run?2f:1), direction.y * speed.y);
+		if(direction.len() > 0){
+			move(direction.x * speed.x * (run?2f:1), direction.y * speed.y);
+		}
+		
 		if(position.x < ValtersGame.map.getLeftCap() || position.x > ValtersGame.map.getRightCap() + Gdx.graphics.getWidth() / 2 - 64) {
 			state = position.x <= ValtersGame.map.getLeftCap()?IDLE_L:IDLE_R;
 			position.x = position.x <= ValtersGame.map.getLeftCap()? ValtersGame.map.getLeftCap() : ValtersGame.map.getRightCap() + Gdx.graphics.getWidth() / 2 - 64;
@@ -138,31 +144,36 @@ public class ValterChar extends ValtersObject{
 			}
 		}
 		
-		batch.draw(shadow, position.x - (shadow.getWidth() * scale / 2), position.y - 18, shadow.getWidth() * scale, shadow.getHeight() * scale);
+		batch.draw(shadow, position.x - 6, position.y - 18, shadow.getWidth() * scale * 0.95f, shadow.getHeight() * scale * 0.95f);
 		
 		if(state != IDLE_L && state != IDLE_R) {
 			animTime += Gdx.graphics.getDeltaTime();
 		}else {			
 			if(state == IDLE_R) {
-				batch.draw(idleTexture, (int) (position.x - (idleTexture.getWidth() * scale / 2) + 24), position.y - 8, idleTexture.getWidth() * scale, idleTexture.getHeight() * scale);
+				batch.draw(idleTexture, position.x + 16, position.y - 8, idleTexture.getWidth() * scale, idleTexture.getHeight() * scale);
 			}else {
-				batch.draw(idleTexture, (int) (position.x + (idleTexture.getWidth() * scale / 2) - 24), position.y - 8, -idleTexture.getWidth() * scale, idleTexture.getHeight() * scale);
+				batch.draw(idleTexture, position.x + 110, position.y - 8, -idleTexture.getWidth() * scale, idleTexture.getHeight() * scale);
 			}
 		}
 		
 		if(state == WALKING_R) {
 			TextureRegion tr = walkAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x - (tr.getRegionWidth() * scale / 2)), position.y, tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
+			batch.draw(tr, position.x, position.y, tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}else if(state == WALKING_L) {
 			TextureRegion tr = walkAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x + (tr.getRegionWidth() * scale / 2)), position.y, -tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
+			batch.draw(tr, position.x + 130, position.y, -tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}else if(state == RUNNING_R) {
 			TextureRegion tr = runAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x - (tr.getRegionWidth() * scale / 2)), position.y, tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
+			batch.draw(tr, position.x, position.y, tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}else if(state == RUNNING_L) {
 			TextureRegion tr = runAnim.getKeyFrame(animTime, true);
-			batch.draw(tr, (int) (position.x + (tr.getRegionWidth() * scale / 2)), position.y, -tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
+			batch.draw(tr, position.x + 130, position.y, -tr.getRegionWidth() * scale, tr.getRegionHeight() * scale);
 		}
+	}
+	
+	@Override
+	public Rectangle getCollider(){
+		return new Rectangle(position.x, position.y, 167f * 0.8f, 400f * 0.8f);
 	}
 	
 	public void dispose() {

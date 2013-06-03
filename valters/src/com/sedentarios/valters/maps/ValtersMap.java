@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
@@ -26,6 +28,8 @@ public abstract class ValtersMap {
 	public static final byte LAYERS = 3; 
 	
 	private float runtime = 0f;
+	
+	private static boolean debugCollision = false;
 	
 	public ValtersMap(int leftCap, int rightCap) {
 		layers = new Array<Array<ValtersObject>>();
@@ -89,15 +93,30 @@ public abstract class ValtersMap {
 		inBatchRender(camera, batch);
 		for(Array<ValtersObject> layer : layers){
 			for(ValtersObject object : calculateDepth(layer)) {
-				object.render(batch);
+				object.internalRender(batch);
 				if(object.isWaitingRemoval()){
 					removeObject(object);
 				}
 			}
 		}
-		postObjectRender(camera, batch);
+		postObjectRender(camera, batch);		
 		batch.end();
+		
+		if(debugCollision){
+			for(Array<ValtersObject> layer : layers){
+				for(ValtersObject obj : layer){
+					if(obj.getCollisionComponent() != null){
+						shapeRenderer.begin(ShapeType.Line);
+						shapeRenderer.rect(obj.getCollisionComponent().getRect().x + Gdx.graphics.getWidth() / 2 - camera.position.x,
+								obj.getCollisionComponent().getRect().y,
+								obj.getCollisionComponent().getRect().width, obj.getCollisionComponent().getRect().height);
+						shapeRenderer.end();
+					}
+				}
+			}
+		}
 	}
+	ShapeRenderer shapeRenderer = new ShapeRenderer();
 	
 	protected void postObjectRender(OrthographicCamera camera, SpriteBatch batch){}
 	

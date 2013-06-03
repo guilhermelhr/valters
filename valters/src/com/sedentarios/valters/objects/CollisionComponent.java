@@ -1,13 +1,12 @@
 package com.sedentarios.valters.objects;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.sedentarios.valters.CollisionManager;
 
 public class CollisionComponent {
 
+	private ValtersObject object;
 	private Rectangle rect;
-	private boolean active = true;
-	private float cooldown = CollisionManager.cooldownTime;	
+	private boolean active = true;	
 	
 	public CollisionComponent(Rectangle rect) {
 		this.rect = rect;
@@ -15,6 +14,26 @@ public class CollisionComponent {
 	
 	public boolean isActive() {
 		return active;
+	}
+	
+	public void setOwner(ValtersObject object){
+		this.object = object;
+	}
+	
+	public ValtersObject getOwner(){
+		return object;
+	}
+	
+	public Rectangle getRect(){
+		return rect;
+	}
+	
+	public boolean collidesWith(CollisionComponent component){
+		if(!component.getOwner().equals(object) && object.isEnabled() && rect.overlaps(component.rect)){
+			return true;
+		}
+		
+		return false;
 	}
 	
 }

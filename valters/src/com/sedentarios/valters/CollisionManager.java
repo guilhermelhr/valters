@@ -5,14 +5,20 @@ import com.sedentarios.valters.objects.CollisionComponent;
 
 public class CollisionManager {
 	
-	public static final float cooldownTime = 3f;
+	private static Array<CollisionComponent> scope = new Array<CollisionComponent>();
 	
-	private Array<CollisionComponent> globalScope = new Array<CollisionComponent>();
-	private Array<CollisionComponent> activeScope = new Array<CollisionComponent>();
-	
-	public void sortComponents(){
-		
+	public static void registerComponent(CollisionComponent component){
+		scope.add(component);
 	}
+	
+	public static boolean isColliding(CollisionComponent component){
+		for(CollisionComponent cc : scope){
+			if(component.collidesWith(cc)){
+				return true;
+			}
+		}
 		
+		return false;
+	}
 	
 }
