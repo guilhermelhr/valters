@@ -16,7 +16,7 @@ import com.sedentarios.valters.objects.ObjectAccessor;
 import com.sedentarios.valters.objects.ValtersObject;
 
 public class ValtersGame implements ApplicationListener {
-	private OrthographicCamera camera;
+	public static OrthographicCamera camera;
 	public static ValtersMap map;
 	public static ValtersObject valter;
 	public static Controller controller;

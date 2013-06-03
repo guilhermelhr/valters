@@ -6,10 +6,16 @@ public class CollisionComponent {
 
 	private ValtersObject object;
 	private Rectangle rect;
-	private boolean active = true;	
+	private boolean active = true;
+	private boolean isOnlyTrigger = false;
 	
-	public CollisionComponent(Rectangle rect) {
+	public CollisionComponent(Rectangle rect){
+		this(rect, false);
+	}
+	
+	public CollisionComponent(Rectangle rect, boolean isOnlyTrigger) {
 		this.rect = rect;
+		this.isOnlyTrigger = isOnlyTrigger;
 	}
 	
 	public boolean isActive() {
@@ -26,6 +32,10 @@ public class CollisionComponent {
 	
 	public Rectangle getRect(){
 		return rect;
+	}
+	
+	public boolean isOnlyTrigger(){
+		return isOnlyTrigger;
 	}
 	
 	public boolean collidesWith(CollisionComponent component){

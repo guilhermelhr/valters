@@ -11,9 +11,18 @@ public class CollisionManager {
 		scope.add(component);
 	}
 	
+	public static void unregisterComponent(CollisionComponent component){
+		scope.removeValue(component, false);
+	}
+	
 	public static boolean isColliding(CollisionComponent component){
 		for(CollisionComponent cc : scope){
 			if(component.collidesWith(cc)){
+				cc.getOwner().onCollision(component);
+				component.getOwner().onCollision(cc);
+				if(cc.isOnlyTrigger() || component.isOnlyTrigger()){
+					return false;
+				}
 				return true;
 			}
 		}

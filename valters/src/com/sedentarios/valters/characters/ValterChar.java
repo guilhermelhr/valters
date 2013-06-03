@@ -58,7 +58,7 @@ public class ValterChar extends ValtersObject{
 	}
 	
 	public ValterChar(float x, float y) {
-		super("valter", x, y, (byte) 1, true);
+		super("valter", x, y, (byte) 1, true, false);
 	}
 	
 	public void create() {
@@ -173,7 +173,7 @@ public class ValterChar extends ValtersObject{
 	
 	@Override
 	public Rectangle getCollider(){
-		return new Rectangle(position.x, position.y, 167f * 0.8f, 400f * 0.8f);
+		return new Rectangle(position.x, position.y, 167f * 0.8f, 100f * 0.8f);
 	}
 	
 	public void dispose() {

@@ -19,6 +19,7 @@ public abstract class ValtersObject {
 	protected byte layer = 1;
 	private boolean waitingRemoval = false;
 	private boolean collidable = false;
+	private boolean triggerOnly = false;
 
 	private float width, height;
 
@@ -40,14 +41,15 @@ public abstract class ValtersObject {
 	}
 
 	public ValtersObject(String name, float x, float y, byte layer,
-			boolean collidable) {
+			boolean collidable, boolean triggerOnly) {
 		this(name, x, y, layer);
 		this.collidable = collidable;
+		this.triggerOnly = triggerOnly;
 	}
 
 	public void create() {
 		if (collidable){
-			collision = new CollisionComponent(getCollider());
+			collision = new CollisionComponent(getCollider(), triggerOnly);
 			CollisionManager.registerComponent(collision);
 			collision.setOwner(this);
 		}
@@ -62,6 +64,8 @@ public abstract class ValtersObject {
 	}
 
 	public abstract void render(SpriteBatch batch);
+	
+	public void postObjectsRender(SpriteBatch batch){}
 
 	protected boolean move(float x, float y) {
 		if (collision != null) {
@@ -83,6 +87,10 @@ public abstract class ValtersObject {
 		return false;
 	}
 
+	public void onCollision(CollisionComponent other){
+		//System.out.println(String.format("Collision between %s and %s", getName(), other.getOwner().getName()));
+	}
+	
 	protected boolean move(Vector2 step) {
 		return move(step.x, step.y);
 	}
@@ -131,6 +139,10 @@ public abstract class ValtersObject {
 	public void requestDeath() {
 		enabled = false;
 		waitingRemoval = true;
+		if(collidable){
+			CollisionManager.unregisterComponent(collision);
+			collision = null;
+		}
 	}
 
 	public boolean isWaitingRemoval() {

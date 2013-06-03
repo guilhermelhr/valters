@@ -29,7 +29,7 @@ public abstract class ValtersMap {
 	
 	private float runtime = 0f;
 	
-	private static boolean debugCollision = false;
+	private static boolean debugCollision = true;
 	
 	public ValtersMap(int leftCap, int rightCap) {
 		layers = new Array<Array<ValtersObject>>();
@@ -97,6 +97,11 @@ public abstract class ValtersMap {
 				if(object.isWaitingRemoval()){
 					removeObject(object);
 				}
+			}
+		}
+		for(Array<ValtersObject> layer : layers){
+			for(ValtersObject object : calculateDepth(layer)) {
+				object.postObjectsRender(batch);
 			}
 		}
 		postObjectRender(camera, batch);		
