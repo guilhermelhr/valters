@@ -1,9 +1,9 @@
 package com.sedentarios.valters;
 
+import com.badlogic.gdx.Gdx;
+
 import java.util.HashMap;
 import java.util.Map.Entry;
-
-import com.badlogic.gdx.Gdx;
 
 public class ControllerWrapper {
 	private static HashMap<String, Integer> buttonToInput = new HashMap<String, Integer>();

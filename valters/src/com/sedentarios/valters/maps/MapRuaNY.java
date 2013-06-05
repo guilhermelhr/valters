@@ -5,7 +5,6 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.equations.Bounce;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,11 +16,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.sedentarios.valters.ValtersGame;
 import com.sedentarios.valters.characters.ValterChar;
-import com.sedentarios.valters.objects.ObjectAccessor;
-import com.sedentarios.valters.objects.ObjectCar;
-import com.sedentarios.valters.objects.ObjectFallingValter;
-import com.sedentarios.valters.objects.ObjectJornal;
-import com.sedentarios.valters.objects.ValtersObject;
+import com.sedentarios.valters.objects.*;
 
 public class MapRuaNY extends ValtersMap{
 	private Texture background;
@@ -66,7 +61,8 @@ public class MapRuaNY extends ValtersMap{
 		fallingValter.setEnabled(false);
 		ValtersGame.valter = fallingValter;
 		addObject(new ObjectJornal(900, 230));
-		
+
+		final int mapHash = this.hashCode();
 		Tween.mark().delay(1f).setCallback(new TweenCallback() {
 			@Override
 			public void onEvent(int type, BaseTween<?> source) {
@@ -76,8 +72,10 @@ public class MapRuaNY extends ValtersMap{
 					new TweenCallback() {			
 						@Override
 						public void onEvent(int type, BaseTween<?> source) {
-							removeObject(fallingValter);
-							addObject(ValtersGame.valter = new ValterChar(325, 250, 200, 280, 0.8f));
+							if(mapHash == ValtersGame.map.hashCode()){
+								removeObject(fallingValter);
+								addObject(ValtersGame.valter = new ValterChar(325, 250, 200, 280, 0.8f));
+							}
 						}
 					}
 				)).start(ValtersGame.tweenManager);
@@ -89,6 +87,12 @@ public class MapRuaNY extends ValtersMap{
 	public void dispose(){
 		super.dispose();
 		background.dispose();
+		backgroundMusic.stop();
+		backgroundMusic.dispose();
+		font.dispose();
+		for(Texture t : noise){
+			t.dispose();
+		}
 	}
 	
 	private float fps = 1f/19f;

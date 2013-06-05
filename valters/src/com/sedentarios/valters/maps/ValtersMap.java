@@ -9,8 +9,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
+import com.sedentarios.valters.CollisionManager;
 import com.sedentarios.valters.ValtersGame;
 import com.sedentarios.valters.objects.ValtersObject;
+import com.sedentarios.valters.ui.UIScene;
 
 public abstract class ValtersMap {
 	
@@ -29,7 +31,9 @@ public abstract class ValtersMap {
 	
 	private float runtime = 0f;
 	
-	private static boolean debugCollision = true;
+	private static boolean debugCollision = false;
+
+	protected UIScene uiScene;
 	
 	public ValtersMap(int leftCap, int rightCap) {
 		layers = new Array<Array<ValtersObject>>();
@@ -51,7 +55,7 @@ public abstract class ValtersMap {
 	}
 	
 	public void removeObject(ValtersObject object) {
-		if(!toBeRemoved.contains(object, false)) {
+		if(toBeRemoved != null && !toBeRemoved.contains(object, false)) {
 			toBeRemoved.add(object);
 		}
 	}
@@ -104,7 +108,11 @@ public abstract class ValtersMap {
 				object.postObjectsRender(batch);
 			}
 		}
-		postObjectRender(camera, batch);		
+		postObjectRender(camera, batch);
+
+		if(uiScene != null && uiScene.isActive()){
+			uiScene.render(batch);
+		}
 		batch.end();
 		
 		if(debugCollision){
@@ -177,11 +185,12 @@ public abstract class ValtersMap {
 		toBeRemoved = null;
 		layers.clear();
 		layers = null;
+		CollisionManager.clearComponents();
 		
 		if(map != null) map.dispose();
 		if(renderer != null) renderer.dispose();
 		if(batch != null) batch.dispose();
-		
+		if(uiScene != null) uiScene.dispose();
 		disposed = true;
 	}
 	

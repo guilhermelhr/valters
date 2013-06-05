@@ -14,16 +14,17 @@ public class CollisionManager {
 	public static void unregisterComponent(CollisionComponent component){
 		scope.removeValue(component, false);
 	}
+
+	public static void clearComponents(){
+		scope.clear();
+	}
 	
 	public static boolean isColliding(CollisionComponent component){
 		for(CollisionComponent cc : scope){
 			if(component.collidesWith(cc)){
 				cc.getOwner().onCollision(component);
 				component.getOwner().onCollision(cc);
-				if(cc.isOnlyTrigger() || component.isOnlyTrigger()){
-					return false;
-				}
-				return true;
+				return !(cc.isOnlyTrigger() || component.isOnlyTrigger());
 			}
 		}
 		

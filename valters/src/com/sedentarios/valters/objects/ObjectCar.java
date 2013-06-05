@@ -48,6 +48,10 @@ public class ObjectCar extends ValtersObject {
 			frames[i] = null;
 		}
 		carAtlas.dispose();
+		horn.stop();
+		horn.dispose();
+		car.stop();
+		car.dispose();
 	}
 
 	private boolean playedHorn = false;

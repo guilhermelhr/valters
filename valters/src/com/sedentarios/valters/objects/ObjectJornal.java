@@ -62,6 +62,7 @@ public class ObjectJornal extends ValtersObject {
 			batch.draw(jornal, ValtersGame.camera.position.x - jornal.getWidth() / 2, 0);
 			if(ControllerWrapper.isInputActive("action")){
 				requestDeath();
+                ValtersGame.valter.setEnabled(true);
 			}
 		}
 	}
@@ -77,6 +78,7 @@ public class ObjectJornal extends ValtersObject {
 			pickupSound.play();
 			//this.requestDeath();
 			picked = true;
+            other.getOwner().setEnabled(false);
 		}
 	}
 }

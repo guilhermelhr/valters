@@ -29,8 +29,8 @@ public class ObjectFallingValter extends ValtersObject {
 
 	@Override
 	public void dispose() {
-		for(int i = 0; i < 41; i++){
-			frames[i].dispose();
+		for(int i = 0; i < frames.length; i++){
+			if(frames[i] != null) frames[i].dispose();
 			frames[i] = null;
 		}
 		sombra.dispose();
@@ -46,7 +46,7 @@ public class ObjectFallingValter extends ValtersObject {
 			}
 		}
 		
-		/* fórmula mágica do capeta para sincronizar a sombra com a animação do valter caindo */
+		/* fï¿½rmula mï¿½gica do capeta para sincronizar a sombra com a animaï¿½ï¿½o do valter caindo */
 		float mod = getPosition().y / 250 * 0.65f + (currFrame>=14?(currFrame<=18?(currFrame - 14) * 0.1f:18 * 0.1f):0);
 		float umod = currFrame >= 28?(28 - Math.min(currFrame, 32)) * 64:0;
 		

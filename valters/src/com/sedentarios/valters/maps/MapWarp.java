@@ -27,6 +27,10 @@ public class MapWarp extends ValtersMap{
 	public MapWarp(int leftCap, int rightCap) {
 		super(leftCap, rightCap);
 	}
+
+	public MapWarp(){
+		super(0, 0);
+	}
 	
 	@Override
 	public void create() {
@@ -55,8 +59,8 @@ public class MapWarp extends ValtersMap{
 	
 	public void dispose() {
 		super.dispose();
-		for(int i = 0; i < frames.length; i++){
-			frames[i].dispose();
+		for (Texture frame : frames) {
+			frame.dispose();
 		}
 		portalSound.dispose();
 		portaSound.dispose();

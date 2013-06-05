@@ -2,7 +2,6 @@ package com.sedentarios.valters;
 
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -10,7 +9,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.sedentarios.valters.maps.MapRuaNY;
+import com.sedentarios.valters.maps.MapMenu;
 import com.sedentarios.valters.maps.ValtersMap;
 import com.sedentarios.valters.objects.ObjectAccessor;
 import com.sedentarios.valters.objects.ValtersObject;
@@ -44,17 +43,19 @@ public class ValtersGame implements ApplicationListener {
 		
 		ControllerWrapper.bindButtonToInput(0, "action");
 		ControllerWrapper.bindButtonToInput(1, "run");
-		
+
 		ControllerWrapper.bindKeyToInput(Keys.W, "up");
 		ControllerWrapper.bindKeyToInput(Keys.S, "down");
 		ControllerWrapper.bindKeyToInput(Keys.D, "right");
 		ControllerWrapper.bindKeyToInput(Keys.A, "left");
+
+		ControllerWrapper.bindKeyToInput(Keys.ESCAPE, "exit");
 		
 		ControllerWrapper.bindKeyToInput(Keys.E, "action");
 		ControllerWrapper.bindKeyToInput(Keys.SHIFT_LEFT, "run");
 		
 		//changeMap(new MapEscola());
-		changeMap(new MapRuaNY());
+		changeMap(new MapMenu());
 	}
 	
 	public static void clearStage(){	
@@ -106,11 +107,7 @@ public class ValtersGame implements ApplicationListener {
 		if(valter != null) {
 			camera.position.set(Math.max(ValtersGame.map.getLeftCap() + Gdx.graphics.getWidth() / 2 - 60, Math.min(ValtersGame.map.getRightCap(),(int) valter.getPosition().x + 50)), 360, 0);
 		}else {
-			if(map != null){
-				valter = map.getObject("valter");
-			}else{
-				return;
-			}
+			valter = map.getObject("valter");
 		}
 		
 		camera.update();
@@ -121,6 +118,10 @@ public class ValtersGame implements ApplicationListener {
 		
 		if(showMousePos){
 			System.out.println((valter.getPosition().x) + " " + (valter.getPosition().y));
+		}
+
+		if(ControllerWrapper.isInputActive("exit")){
+			changeMap(new MapMenu());
 		}
 	}
 
