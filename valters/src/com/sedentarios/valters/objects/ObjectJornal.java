@@ -33,6 +33,7 @@ public class ObjectJornal extends ValtersObject {
 
 	@Override
 	public void dispose() {
+		super.dispose();
 		sprite.dispose();
 		jornal.dispose();
 		pickupSound.dispose();

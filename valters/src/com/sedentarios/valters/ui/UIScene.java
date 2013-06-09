@@ -13,6 +13,11 @@ public class UIScene {
 	private int focus = 0;
 
 
+	public UIScene(int focus){
+		this();
+		this.focus = focus;
+	}
+
 	public UIScene(){
 		components = new Array<UIComponent>();
 	}
@@ -51,12 +56,14 @@ public class UIScene {
 			if(component.isActive()) component.render(batch);
 		}
 
-		if(ControllerWrapper.isInputActive("up") && delayAction <= 0f){
+		if((ControllerWrapper.isInputActive("up") || ControllerWrapper.isInputActive("left")) && delayAction <= 0f){
 			focus--;
 			delayAction = .2f;
-		}else if(ControllerWrapper.isInputActive("down") && delayAction <= 0f){
+			onFocusChange();
+		}else if((ControllerWrapper.isInputActive("down") || ControllerWrapper.isInputActive("right")) && delayAction <= 0f){
 			focus++;
 			delayAction = .2f;
+			onFocusChange();
 		}
 
 		if(focus > components.size - 1){
@@ -64,6 +71,10 @@ public class UIScene {
 		}else if(focus < 0){
 			focus = components.size - 1;
 		}
+	}
+
+	protected void onFocusChange(){
+
 	}
 
 	public boolean isActive(){

@@ -25,10 +25,10 @@ public class ValtersGame implements ApplicationListener {
 	public void create() {
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-		
+
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, w, h);
-		
+
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(ValtersObject.class, new ObjectAccessor());
 		
@@ -40,25 +40,31 @@ public class ValtersGame implements ApplicationListener {
 		ControllerWrapper.bindAxisToInput(1, "down");
 		ControllerWrapper.bindAxisToInput(2, "right");
 		ControllerWrapper.bindAxisToInput(-2, "left");
-		
+
 		ControllerWrapper.bindButtonToInput(0, "action");
 		ControllerWrapper.bindButtonToInput(1, "run");
+
+		ControllerWrapper.bindButtonToInput(4, "exit");
 
 		ControllerWrapper.bindKeyToInput(Keys.W, "up");
 		ControllerWrapper.bindKeyToInput(Keys.S, "down");
 		ControllerWrapper.bindKeyToInput(Keys.D, "right");
 		ControllerWrapper.bindKeyToInput(Keys.A, "left");
 
+		ControllerWrapper.bindKeyToInput(Keys.SPACE, "jump");
+
 		ControllerWrapper.bindKeyToInput(Keys.ESCAPE, "exit");
+		ControllerWrapper.setInputDelay("exit", 1f);
 		
 		ControllerWrapper.bindKeyToInput(Keys.E, "action");
+		ControllerWrapper.setInputDelay("action", 3f);
 		ControllerWrapper.bindKeyToInput(Keys.SHIFT_LEFT, "run");
 		
-		//changeMap(new MapEscola());
-		changeMap(new MapMenu());
+		//changeMap(MapEscola.class);
+		changeMap(MapMenu.class);
 	}
 	
-	public static void clearStage(){	
+	public static void clearStage(){
 		if(map != null && !map.disposed){
 			map.dispose();
 			map = null;
@@ -69,59 +75,83 @@ public class ValtersGame implements ApplicationListener {
 		}
 	}
 	
-	public static void changeMap(ValtersMap map){
+	private static ValtersMap nextMap;
+	public static void changeMap(Class<? extends ValtersMap> c){
+		try {
+			nextMap = c.newInstance();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void changeMap(ValtersMap map){
 		if(map != null){
 			clearStage();
 			ValtersGame.map = map;
 			map.create();
-			map.createObjects();
 			System.out.println("Map changed to " + map.getClass().getSimpleName());
 		}else{
 			System.err.println("Game tried to load null map");
 		}
+		nextMap = null;
 	}
 
 	@Override
 	public void dispose() {
 		if(map != null && !map.disposed) map.dispose();
 	}
-	
+
 	boolean showMousePos = false;
-	
 	@Override
 	public void render() {
-		
+		ControllerWrapper.update();
+
+		if(map == null && nextMap == null){
+			return;
+		}else if(nextMap != null){
+			changeMap(nextMap);
+			return;
+		}else if(!map.assetManager.update()){
+			map.renderLoading();
+			return;
+		}else if(!map.loaded){
+			map.createObjects();
+			map.loaded = true;
+			System.out.println("Map loaded");
+		}
+
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		
-		if(map == null){
-			return;
-		}
+
 		
 		if(Gdx.input.isKeyPressed(Keys.M)){
 			showMousePos = !showMousePos;
 		}
-		
+
 		map.render(camera);
-		
+
 		if(valter != null) {
-			camera.position.set(Math.max(ValtersGame.map.getLeftCap() + Gdx.graphics.getWidth() / 2 - 60, Math.min(ValtersGame.map.getRightCap(),(int) valter.getPosition().x + 50)), 360, 0);
+			camera.position.set(Math.max(ValtersGame.map.getLeftCap() +
+					Gdx.graphics.getWidth() / 2 - 60, Math.min(ValtersGame.map.getRightCap(),
+					(int) valter.getPosition().x + 50)), 360, 0);
 		}else {
 			valter = map.getObject("valter");
 		}
-		
-		camera.update();
-		
+
 		map.postUpdate();
-		
+
 		tweenManager.update(Gdx.graphics.getDeltaTime());
-		
+
+		camera.update();
+
 		if(showMousePos){
 			System.out.println((valter.getPosition().x) + " " + (valter.getPosition().y));
 		}
 
 		if(ControllerWrapper.isInputActive("exit")){
-			changeMap(new MapMenu());
+			changeMap(MapMenu.class);
 		}
 	}
 

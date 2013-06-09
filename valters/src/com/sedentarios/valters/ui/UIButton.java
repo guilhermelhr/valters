@@ -12,8 +12,14 @@ public abstract class UIButton extends UIComponent{
 	private Texture pressed;
 	private Texture hovered;
 	private Rectangle bounds;
+	private boolean debug = false;
 
-	public UIButton(float x, float y, float width, float height){
+	public UIButton(float x, float y, float width, float height, boolean debug) {
+		this(x, y, width, height);
+		this.debug = debug;
+	}
+
+	public UIButton(float x, float y, float width, float height) {
 		bounds = new Rectangle(x, y, width, height);
 	}
 
@@ -46,16 +52,20 @@ public abstract class UIButton extends UIComponent{
 				if(pressed != null) toBeRendered = pressed;
 				break;
 			case FOCUSED:
-				if(pressed != null) toBeRendered = hovered;
+				if(hovered != null) toBeRendered = hovered;
+			case NOT_FOCUSED:
+				break;
 		}
 
 		if(toBeRendered != null)
 			batch.draw(toBeRendered, getBounds().getX(), getBounds().getY(), getBounds().getWidth(), getBounds().getHeight());
 
-		sr.begin(ShapeRenderer.ShapeType.Line);
-		if(getState().equals(UIComponentState.FOCUSED))sr.setColor(Color.BLUE);else sr.setColor(Color.GRAY);
-		sr.rect(getBounds().getX(), getBounds().getY(), getBounds().getWidth(), getBounds().getHeight());
-		sr.end();
+		if(debug) {
+			sr.begin(ShapeRenderer.ShapeType.Line);
+			if(getState().equals(UIComponentState.FOCUSED))sr.setColor(Color.BLUE);else sr.setColor(Color.GRAY);
+			sr.rect(getBounds().getX(), getBounds().getY(), getBounds().getWidth(), getBounds().getHeight());
+			sr.end();
+		}
 	}
 
 	public void setRegularTexture(Texture regular) {

@@ -3,7 +3,7 @@ package com.sedentarios.valters.maps;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.sedentarios.valters.ControllerWrapper;
 import com.sedentarios.valters.ValtersGame;
@@ -26,35 +26,36 @@ public class MapEscola extends ValtersMap{
 	}
 	
 	@Override
-	public void create() {		
-		etimPlate = new Texture("assets/Objs/placa.png");
-		lixo = new Texture("assets/Objs/lixo.png");
-		sombra = new Texture("assets/Anim/sombra.png");
-		
-		map = new TmxMapLoader().load("assets/Maps/escola.tmx");
-		renderer = new OrthogonalTiledMapRenderer(map, 2.1f);
+	public void create() {
+		assetManager.load("assets/Objs/placa.png", Texture.class);
+		assetManager.load("assets/Objs/lixo.png", Texture.class);
+		assetManager.load("assets/Anim/sombra.png", Texture.class);
+		assetManager.load("assets/Maps/escola.tmx", TiledMap.class);
 	}
 	
 	@Override
 	public void createObjects(){
+		etimPlate = assetManager.get("assets/Objs/placa.png", Texture.class);
+		lixo = assetManager.get("assets/Objs/lixo.png", Texture.class);
+		sombra = assetManager.get("assets/Anim/sombra.png", Texture.class);
+
+		//map = new TmxMapLoader().load("assets/Maps/escola.tmx");
+		map = assetManager.get("assets/Maps/escola.tmx", TiledMap.class);
+
+		renderer = new OrthogonalTiledMapRenderer(map, 2.1f);
+
 		addObject(valter = new ValterChar(88f, 20f, 0.9f));
 		addObject(new ObjectMesa(770f, 160f));
 		
 		ValtersGame.valter = valter;
 	}
 	
-	public void dispose() {
-		super.dispose();
-		etimPlate.dispose();
-	}
-	
 	@Override
 	public void render(OrthographicCamera camera){
 		super.render(camera);
-		if(valter.getPosition().x > 2556 && valter.getPosition().x < 2773){
+		if(valter.getPosition().x > 2540 && valter.getPosition().x < 2750){
 			if(ControllerWrapper.isInputActive("action")){
-				dispose();
-				ValtersGame.changeMap(new MapWarp(0,0));
+				ValtersGame.changeMap(MapWarp.class);
 			}
 		}
 	}

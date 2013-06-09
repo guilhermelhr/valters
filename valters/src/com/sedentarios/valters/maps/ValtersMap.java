@@ -2,11 +2,16 @@ package com.sedentarios.valters.maps;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.sedentarios.valters.CollisionManager;
@@ -22,10 +27,12 @@ public abstract class ValtersMap {
 	
 	private Array<Array<ValtersObject>> layers;
 	private Array<ValtersObject> toBeRemoved;
+	public AssetManager assetManager;
 	
 	protected int leftCap, rightCap;
 	
 	public boolean disposed = false;
+	public boolean loaded = false;
 	
 	public static final byte LAYERS = 3; 
 	
@@ -36,17 +43,23 @@ public abstract class ValtersMap {
 	protected UIScene uiScene;
 	
 	public ValtersMap(int leftCap, int rightCap) {
+		assetManager = new AssetManager();
+		assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+
 		layers = new Array<Array<ValtersObject>>();
 		for(int i = 0; i < LAYERS; i++){
 			layers.add(new Array<ValtersObject>());
 		}
 		toBeRemoved = new Array<ValtersObject>();
 		batch = new SpriteBatch();
+
 		this.leftCap = leftCap;
 		this.rightCap = rightCap;
 	}
-	
+
+	/** For loadable assets **/
 	public abstract void create();
+	/** Other assets/objects **/
 	public abstract void createObjects();
 	
 	public void addObject(ValtersObject object) {
@@ -82,6 +95,17 @@ public abstract class ValtersMap {
 		
 		return depthBuffer;
 	}
+
+	BitmapFont font = new BitmapFont();
+	public void renderLoading(){
+		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+
+		batch.begin();
+		font.draw(batch, String.valueOf((int) (assetManager.getProgress() * 100)) + "%", 200, 200);
+		batch.end();
+		//System.out.println(assetManager.getProgress());
+	}
 	
 	public void render(OrthographicCamera camera) {
 		runtime += Gdx.graphics.getDeltaTime();
@@ -115,7 +139,7 @@ public abstract class ValtersMap {
 		}
 		batch.end();
 		
-		if(debugCollision){
+		if(debugCollision && layers != null){
 			for(Array<ValtersObject> layer : layers){
 				for(ValtersObject obj : layer){
 					if(obj.getCollisionComponent() != null){
@@ -181,6 +205,7 @@ public abstract class ValtersMap {
 	}
 
 	public void dispose() {
+		if(uiScene != null) uiScene.dispose();
 		clearObjects();
 		toBeRemoved = null;
 		layers.clear();
@@ -190,7 +215,14 @@ public abstract class ValtersMap {
 		if(map != null) map.dispose();
 		if(renderer != null) renderer.dispose();
 		if(batch != null) batch.dispose();
-		if(uiScene != null) uiScene.dispose();
+
+        try{
+	        assetManager.clear();
+        }catch(Exception ex){
+	        assetManager.dispose();
+	        assetManager.clear();
+        }
+
 		disposed = true;
 	}
 	

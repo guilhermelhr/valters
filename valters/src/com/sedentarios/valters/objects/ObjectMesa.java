@@ -19,6 +19,7 @@ public class ObjectMesa extends ValtersObject{
 	}
 	
 	public void dispose() {
+		super.dispose();
 		texture.dispose();
 	}
 	

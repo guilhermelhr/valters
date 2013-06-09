@@ -29,6 +29,7 @@ public class ObjectFallingValter extends ValtersObject {
 
 	@Override
 	public void dispose() {
+		super.dispose();
 		for(int i = 0; i < frames.length; i++){
 			if(frames[i] != null) frames[i].dispose();
 			frames[i] = null;

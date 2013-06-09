@@ -44,6 +44,8 @@ public class ObjectCar extends ValtersObject {
 
 	@Override
 	public void dispose() {
+		super.dispose();
+
 		for(int i = 0; i < frames.length; i++){
 			frames[i] = null;
 		}

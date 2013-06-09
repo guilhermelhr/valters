@@ -95,9 +95,8 @@ public class MapWarp extends ValtersMap{
 							Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 							stage++;
 						}else{
-							dispose();
 							finished = true;
-							ValtersGame.changeMap(new MapRuaNY());
+							ValtersGame.changeMap(MapRuaNY.class);
 						}
 					}
 				}

@@ -9,10 +9,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.sedentarios.valters.ValtersGame;
 import com.sedentarios.valters.characters.ValterChar;
@@ -20,7 +19,6 @@ import com.sedentarios.valters.objects.*;
 
 public class MapRuaNY extends ValtersMap{
 	private Texture background;
-	public static BitmapFont font = new BitmapFont();
 	private Sound backgroundMusic;
 	//private Sound crowdNoise;
 	private Texture[] noise;
@@ -35,25 +33,33 @@ public class MapRuaNY extends ValtersMap{
 
 	@Override
 	public void create() {
-		font.setScale(5f);
-		
-		map = new TmxMapLoader().load("assets/Maps/RuaNY.tmx");
-		
-		applyShader();
-		
-		background = new Texture("assets/Maps/fundo-parallax_1.png");
-		backgroundMusic = Gdx.audio.newSound(Gdx.files.internal("assets/Music/jazz_bg.wav"));
-		backgroundMusic.loop(0.3f);
+
+		assetManager.load("assets/Maps/RuaNY.tmx", TiledMap.class);
+		assetManager.load("assets/Maps/fundo-parallax_1.png", Texture.class);
+		assetManager.load("assets/Music/jazz_bg.wav", Sound.class);
 		
 		noise = new Texture[3];
 		for(int i = 0; i < noise.length; i++){
-			noise[i] = new Texture("assets/Ruido/ruido" + (i + 1) + ".png");
+			assetManager.load("assets/Ruido/ruido" + (i + 1) + ".png", Texture.class);
 		}
 		//crowdNoise = Gdx.audio.newSound(Gdx.files.internal("assets/Sounds/"));
 	}
 	
 	@Override
 	public void createObjects(){
+		map = assetManager.get("assets/Maps/RuaNY.tmx", TiledMap.class);
+		background = assetManager.get("assets/Maps/fundo-parallax_1.png", Texture.class);
+
+		backgroundMusic = assetManager.get("assets/Music/jazz_bg.wav", Sound.class);
+		backgroundMusic.loop(0.4f);
+
+		noise = new Texture[3];
+		for(int i = 0; i < noise.length; i++){
+			noise[i] = assetManager.get("assets/Ruido/ruido" + (i + 1) + ".png", Texture.class);
+		}
+
+		applyShader();
+
 		addObject(new ObjectCar());
 		//addObject(new ValterChar(88, 250, 200, 280, 0.8f));
 		final ValtersObject fallingValter;
@@ -81,18 +87,6 @@ public class MapRuaNY extends ValtersMap{
 				)).start(ValtersGame.tweenManager);
 			}
 		}).start(ValtersGame.tweenManager);
-	}
-	
-	@Override
-	public void dispose(){
-		super.dispose();
-		background.dispose();
-		backgroundMusic.stop();
-		backgroundMusic.dispose();
-		font.dispose();
-		for(Texture t : noise){
-			t.dispose();
-		}
 	}
 	
 	private float fps = 1f/19f;

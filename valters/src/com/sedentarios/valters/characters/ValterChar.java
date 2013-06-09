@@ -66,7 +66,8 @@ public class ValterChar extends ValtersObject{
 		
 		idleTexture = new Texture("assets/Anim/parado.png");
 		idleTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		walkAtlas = new TextureAtlas("assets/Anim/andar/andar_pack.txt");		
+		walkAtlas = new TextureAtlas("assets/Anim/andar/andar_pack.txt");
+
 		walkTextures = new Array<TextureRegion>();
 		
 		runAtlas = new TextureAtlas("assets/Anim/correr/correr_pack.txt");		
@@ -92,8 +93,9 @@ public class ValterChar extends ValtersObject{
 		
 		super.create();
 	}
-	
-	
+
+	private Vector2 totalJumpAcceleration = new Vector2(0f, 0f);
+	private Vector2 jumpAcceleration = new Vector2(0f, 90f);
 	public void render(SpriteBatch batch) {		
 		direction.set(Vector2.Zero);
 		if(ControllerWrapper.isInputActive("left")) {
@@ -108,6 +110,14 @@ public class ValterChar extends ValtersObject{
 		}
 		if(ControllerWrapper.isInputActive("down")) {
 			direction.add(0, -1 * Gdx.graphics.getDeltaTime());
+		}
+		if(ControllerWrapper.isInputActive("jump")){
+			if(totalJumpAcceleration.len() < 360f){
+				totalJumpAcceleration.add(jumpAcceleration);
+				applyForce(jumpAcceleration);
+			}else if(isTouchingGround()){
+				totalJumpAcceleration.set(0, 0);
+			}
 		}
 		
 		boolean run = ControllerWrapper.isInputActive("run");
@@ -177,7 +187,10 @@ public class ValterChar extends ValtersObject{
 	}
 	
 	public void dispose() {
+		super.dispose();
 		idleTexture.dispose();
+		walkAtlas.dispose();
+		runAtlas.dispose();
 		for(TextureRegion tr : runTextures) {
 			tr.getTexture().dispose();
 		}
