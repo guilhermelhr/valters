@@ -6,16 +6,18 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.sedentarios.valters.CollisionManager;
 import com.sedentarios.valters.ValtersGame;
+import com.sedentarios.valters.ValtersOptions;
+import com.sedentarios.valters.objects.TextBalloon;
 import com.sedentarios.valters.objects.ValtersObject;
 import com.sedentarios.valters.ui.UIScene;
 
@@ -26,6 +28,7 @@ public abstract class ValtersMap {
 	protected SpriteBatch batch;
 	
 	private Array<Array<ValtersObject>> layers;
+	private Array<ValtersObject> behindMap;
 	private Array<ValtersObject> toBeRemoved;
 	public AssetManager assetManager;
 	
@@ -40,16 +43,21 @@ public abstract class ValtersMap {
 	
 	private static boolean debugCollision = false;
 
-	protected UIScene uiScene;
+	protected Array<UIScene> uiScenes;
 	
 	public ValtersMap(int leftCap, int rightCap) {
 		assetManager = new AssetManager();
 		assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
+		
+		TextBalloon.loadResources(assetManager);
+		
+		uiScenes = new Array<UIScene>();
 
 		layers = new Array<Array<ValtersObject>>();
 		for(int i = 0; i < LAYERS; i++){
 			layers.add(new Array<ValtersObject>());
 		}
+		behindMap = new Array<ValtersObject>();
 		toBeRemoved = new Array<ValtersObject>();
 		batch = new SpriteBatch();
 
@@ -63,8 +71,13 @@ public abstract class ValtersMap {
 	public abstract void createObjects();
 	
 	public void addObject(ValtersObject object) {
-		layers.get(object.getLayer()).add(object);
-		object.create();
+		if(object.getLayer() >= 0){
+			layers.get(object.getLayer()).add(object);
+		}else{
+			behindMap.add(object);
+		}
+		
+		object.create();		
 	}
 	
 	public void removeObject(ValtersObject object) {
@@ -81,7 +94,32 @@ public abstract class ValtersMap {
 				}
 			}
 		}
+		
+		for(ValtersObject object : behindMap) {
+			if(object.getName().equals(name)) {
+				return object;
+			}
+		}
+		
 		return null;
+	}
+	
+	public Array<ValtersObject> getObjects(String name){
+		Array<ValtersObject> subjects = new Array<ValtersObject>(); 
+		for(Array<ValtersObject> objects : layers){
+			for(ValtersObject object : objects) {
+				if(object.getName().equals(name)) {
+					subjects.add(object);
+				}
+			}
+		}
+		
+		for(ValtersObject object : behindMap) {
+			if(object.getName().equals(name)) {
+				subjects.add(object);
+			}
+		}
+		return subjects;
 	}
 		
 	private ValtersObject[] calculateDepth(Array<ValtersObject> objects) {
@@ -96,27 +134,32 @@ public abstract class ValtersMap {
 		return depthBuffer;
 	}
 
-	BitmapFont font = new BitmapFont();
 	public void renderLoading(){
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
-		font.draw(batch, String.valueOf((int) (assetManager.getProgress() * 100)) + "%", 200, 200);
+		ValtersGame.font.draw(batch, String.valueOf((int) (assetManager.getProgress() * 100)) + "%", Gdx.graphics.getWidth() / 2 - 32, 200);
 		batch.end();
 		//System.out.println(assetManager.getProgress());
 	}
 	
 	public void render(OrthographicCamera camera) {
 		runtime += Gdx.graphics.getDeltaTime();
+		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
+		for(ValtersObject object : behindMap) {
+			object.internalRender(batch);
+			if(object.isWaitingRemoval()){
+				removeObject(object);
+			}
+		}
 		preMapRender(camera, batch);
 		batch.end();
 		if(renderer != null){
 			renderer.setView(camera);
 			renderer.render();
 		}
-		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		inBatchRender(camera, batch);
 		for(Array<ValtersObject> layer : layers){
@@ -127,31 +170,57 @@ public abstract class ValtersMap {
 				}
 			}
 		}
+		
+		for(ValtersObject object : behindMap) {
+			object.postObjectsRender(batch);
+		}
+		
 		for(Array<ValtersObject> layer : layers){
 			for(ValtersObject object : calculateDepth(layer)) {
 				object.postObjectsRender(batch);
 			}
 		}
 		postObjectRender(camera, batch);
-
-		if(uiScene != null && uiScene.isActive()){
-			uiScene.render(batch);
-		}
 		batch.end();
 		
+		/* collision debug */
 		if(debugCollision && layers != null){
 			for(Array<ValtersObject> layer : layers){
 				for(ValtersObject obj : layer){
 					if(obj.getCollisionComponent() != null){
 						shapeRenderer.begin(ShapeType.Line);
-						shapeRenderer.rect(obj.getCollisionComponent().getRect().x + Gdx.graphics.getWidth() / 2 - camera.position.x,
-								obj.getCollisionComponent().getRect().y,
-								obj.getCollisionComponent().getRect().width, obj.getCollisionComponent().getRect().height);
+						Rectangle rect = obj.getCollisionComponent().getRect();
+						shapeRenderer.rect(rect.x + ValtersOptions.SCREEN_WIDTH / 2 - ValtersGame.getCamPosition().x,
+								rect.y - ValtersGame.getCamDisplacement().y,
+								rect.width, rect.height);
 						shapeRenderer.end();
 					}
 				}
 			}
+			for(ValtersObject obj : behindMap){
+				if(obj.getCollisionComponent() != null){
+					shapeRenderer.begin(ShapeType.Line);
+					Rectangle rect = obj.getCollisionComponent().getRect();
+					shapeRenderer.rect(rect.x + ValtersOptions.SCREEN_WIDTH / 2 - ValtersGame.getCamPosition().x,
+							rect.y - ValtersGame.getCamDisplacement().y,
+							rect.width, rect.height);
+					shapeRenderer.end();
+				}
+			}
 		}
+		
+		camera.position.x = ValtersOptions.SCREEN_WIDTH / 2;
+		camera.position.y = ValtersOptions.SCREEN_HEIGHT / 2;
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		batch.begin();
+		for(UIScene ui : uiScenes){
+			if(ui != null && ui.isActive()){
+				ui.render(batch);
+			}
+		}
+		batch.end();
 	}
 	ShapeRenderer shapeRenderer = new ShapeRenderer();
 	
@@ -167,6 +236,7 @@ public abstract class ValtersMap {
 			for(Array<ValtersObject> layer : layers){
 				layer.removeValue(object, false);
 			}
+			behindMap.removeValue(object, false);
 			Gdx.app.log("Object Processor", "Object " + object.getName() + 
 					"[" + object.hashCode() + "@layer" + object.getLayer() + "] was removed");
 		}
@@ -192,6 +262,30 @@ public abstract class ValtersMap {
 		return runtime;
 	}
 	
+	public UIScene getUIScene(String name){
+		for(UIScene ui : uiScenes){
+			if(ui.getName().equals(name)){
+				return ui;
+			}
+		}
+		
+		return null;
+	}
+	
+	public void removeUIScene(String name){
+		UIScene delete = null;
+		for(UIScene ui : uiScenes){
+			if(ui.getName().equals(name)){
+				delete = ui;
+				break;
+			}
+		}
+		
+		if(delete != null && uiScenes.removeValue(delete, false)){
+			System.out.println(String.format("UI Processor: UI %s[%d] was removed", delete.getName(), delete.hashCode()));
+		}
+	}
+	
 	private void clearObjects() {
 		toBeRemoved.clear();
 		for(Array<ValtersObject> layer : layers){
@@ -202,10 +296,15 @@ public abstract class ValtersMap {
 		for(Array<ValtersObject> layer : layers){
 			layer.clear();		
 		}
+		behindMap.clear();
 	}
 
 	public void dispose() {
-		if(uiScene != null) uiScene.dispose();
+		for(UIScene ui : uiScenes){
+			if(ui != null) ui.dispose();
+		}
+		uiScenes.clear();
+		
 		clearObjects();
 		toBeRemoved = null;
 		layers.clear();
@@ -219,6 +318,7 @@ public abstract class ValtersMap {
         try{
 	        assetManager.clear();
         }catch(Exception ex){
+        	ex.printStackTrace();
 	        assetManager.dispose();
 	        assetManager.clear();
         }
@@ -252,4 +352,8 @@ public abstract class ValtersMap {
            quickSort(v, pivo+1, fim);
         }
     }
+
+	public void onEscape() {
+		ValtersGame.changeMap(MapMenu.class);
+	}
 }

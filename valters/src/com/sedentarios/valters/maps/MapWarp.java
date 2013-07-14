@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.sedentarios.valters.ValtersGame;
+import com.sedentarios.valters.ValtersOptions;
+import com.sedentarios.valters.ValtersTexts;
+import com.sedentarios.valters.objects.TextBalloon;
 
 public class MapWarp extends ValtersMap{
 
@@ -22,7 +25,7 @@ public class MapWarp extends ValtersMap{
 	
 	private boolean finished = false;
 	
-	private byte stage = 0;
+	private byte stage = -2;
 	
 	public MapWarp(int leftCap, int rightCap) {
 		super(leftCap, rightCap);
@@ -34,7 +37,7 @@ public class MapWarp extends ValtersMap{
 	
 	@Override
 	public void create() {
-		portaSound = Gdx.audio.newSound(Gdx.files.internal("assets/Sounds/porta.wav"));
+		portaSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/porta.wav"));
 	}
 	
 	@Override
@@ -47,7 +50,7 @@ public class MapWarp extends ValtersMap{
 	private void loadPortal(){
 		if(spritesLoaded == 0){
 			frames = new Texture[61];
-			portalSound = Gdx.audio.newSound(Gdx.files.internal("assets/Sounds/Portal2.wav"));
+			portalSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/portal2.wav"));
 		}
 		if(spritesLoaded >= frames.length){
 			portalLoaded = true;
@@ -59,31 +62,41 @@ public class MapWarp extends ValtersMap{
 	
 	public void dispose() {
 		super.dispose();
-		for (Texture frame : frames) {
-			frame.dispose();
+		if(frames != null){
+			for (Texture frame : frames) {
+				if(frame != null) frame.dispose();
+			}
 		}
-		portalSound.dispose();
-		portaSound.dispose();
+		if(portalSound != null) portalSound.dispose();
+		if(portaSound != null) portaSound.dispose();
 	}
 	
 	private boolean abrePortaPlayed = false;
+	private TextBalloon balloon;
 	@Override
 	public void render(OrthographicCamera camera){
 		super.render(camera);
+		ValtersGame.setCamPosition(0, 0);
 		
 		if(!finished){
-			if(stage == 0){
+			if(stage == -2){
+				addObject(balloon = new TextBalloon(null, ValtersTexts.get("Valter2"), 0, 0));
+				balloon.setPosition(0, -400);
+				stage++;
+			}else if(stage == -1){
+				if(balloon.isWaitingRemoval()){
+					stage++;
+				}
+			}else if(stage == 0){
 				if(!portalLoaded) loadPortal();
 				if(!abrePortaPlayed){
 					abrePortaPlayed = true;
-					portaSound.play();
+					portaSound.play(ValtersOptions.SOUND_LEVEL);
 				}else if(getRuntime() >= 3f && portalLoaded){
 					stage++;
-					portalSound.play();
+					portalSound.play(ValtersOptions.SOUND_LEVEL);
 				}
 			}else{
-				camera.position.x = 0;
-				camera.position.y = 0;
 				frameExposure += Gdx.graphics.getDeltaTime();
 				if(frameExposure >= fps){
 					if(currFrame < frames.length - 1){
@@ -106,6 +119,7 @@ public class MapWarp extends ValtersMap{
 	
 	@Override
 	public void inBatchRender(OrthographicCamera camera, SpriteBatch batch) {
+		super.inBatchRender(camera, batch);
 		if(!finished && stage == 1)
 			batch.draw(frames[currFrame], -Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2,
 									  Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

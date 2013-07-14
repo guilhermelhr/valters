@@ -14,7 +14,7 @@ public class ObjectMesa extends ValtersObject{
 	}
 	
 	public void create() {
-		texture = new Texture("assets/Objs/mesa.png");
+		texture = new Texture("assets/objs/mesa.png");
 		texture.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 	}
 	

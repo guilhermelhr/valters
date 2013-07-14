@@ -5,8 +5,14 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class UIComponent {
 
+	private String name;
 	private boolean active = true;
+	public boolean focusable = true;
 	private UIComponentState state = UIComponentState.NOT_FOCUSED;
+	
+	public UIComponent(String name){
+		this.name = name;
+	}
 
 	public abstract Rectangle getBounds();
 	public abstract void onFocus();
@@ -26,6 +32,12 @@ public abstract class UIComponent {
 	public boolean isActive(){
 		return active;
 	}
+	
+	public String getName(){
+		return name;
+	}
+
+	public void sceneLostFocus(){}
 
 	public abstract void dispose();
 }

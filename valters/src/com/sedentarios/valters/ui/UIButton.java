@@ -14,12 +14,13 @@ public abstract class UIButton extends UIComponent{
 	private Rectangle bounds;
 	private boolean debug = false;
 
-	public UIButton(float x, float y, float width, float height, boolean debug) {
-		this(x, y, width, height);
+	public UIButton(String name, float x, float y, float width, float height, boolean debug) {
+		this(name, x, y, width, height);
 		this.debug = debug;
 	}
 
-	public UIButton(float x, float y, float width, float height) {
+	public UIButton(String name, float x, float y, float width, float height) {
+		super(name);
 		bounds = new Rectangle(x, y, width, height);
 	}
 
@@ -58,7 +59,7 @@ public abstract class UIButton extends UIComponent{
 		}
 
 		if(toBeRendered != null)
-			batch.draw(toBeRendered, getBounds().getX(), getBounds().getY(), getBounds().getWidth(), getBounds().getHeight());
+			batch.draw(toBeRendered, getBounds().getX(),  getBounds().getY(), getBounds().getWidth(), getBounds().getHeight());
 
 		if(debug) {
 			sr.begin(ShapeRenderer.ShapeType.Line);

@@ -22,9 +22,9 @@ public class ObjectFallingValter extends ValtersObject {
 	public void create() {
 		frames = new Texture[41];
 		for(int i = 0; i < 41; i++){
-			frames[i] = new Texture(String.format("assets/Anim/cair/caindo00%d.png", i + 1));
+			frames[i] = new Texture(String.format("assets/anim/cair/caindo00%d.png", i + 1));
 		}
-		sombra = new Texture("assets/Anim/sombra.png");
+		sombra = new Texture("assets/anim/sombra.png");
 	}
 
 	@Override

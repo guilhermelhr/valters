@@ -1,5 +1,7 @@
 package com.sedentarios.valters.objects;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -15,6 +17,8 @@ public abstract class ValtersObject {
 	protected Vector2 position = new Vector2();
 	private Vector2 center;
 	protected boolean enabled = true;
+	protected float rotation = 0f;
+	public boolean frozen = false;
 	/**
 	 * est� sendo ignorado, acho que � mais simples resolver a profundidade de
 	 * todos os objetos mesmo
@@ -24,8 +28,9 @@ public abstract class ValtersObject {
 	private boolean waitingRemoval = false;
 	private boolean collidable = false;
 	private boolean triggerOnly = false;
-	private boolean allowYMovement = true;
+	protected boolean allowYMovement = true;
 	private Array<String> flags = new Array<String>();
+	private HashMap<String, String> attributes = new HashMap<String, String>();
 
 	/** forces **/
 	private float gravity = 0f;
@@ -93,7 +98,7 @@ public abstract class ValtersObject {
 	
 	public void postObjectsRender(SpriteBatch batch){}
 
-	protected boolean move(float x, float y){
+	public boolean move(float x, float y){
 		return move(x, y, false);
 	}
 
@@ -128,6 +133,10 @@ public abstract class ValtersObject {
 		//System.out.println(String.format("Collision between %s and %s", getName(), other.getOwner().getName()));
 	}
 	
+	public void onDamage(ValtersObject other){
+		
+	}
+	
 	protected boolean move(Vector2 step) {
 		return move(step.x, step.y);
 	}
@@ -156,7 +165,15 @@ public abstract class ValtersObject {
 	public void setHeight(float height) {
 		this.height = height;
 	}
-
+	
+	public float getRotation() {
+		return rotation;
+	}
+	
+	public void setRotation(float rotation){
+		this.rotation = rotation;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -179,6 +196,14 @@ public abstract class ValtersObject {
 
 	public byte getLayer() {
 		return layer;
+	}
+	
+	public void setAttribute(String name, String value){
+		attributes.put(name, value);
+	}
+	
+	public String getAttribute(String name){
+		return attributes.get(name);
 	}
 
 	public void addFlag(String flag){
@@ -235,6 +260,10 @@ public abstract class ValtersObject {
 	public Rectangle getCollider() {
 		assert false;
 		return null;
+	}
+
+	public boolean run(float x, float y) {
+		return move(x, y);
 	}
 
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.sedentarios.valters.ValtersGame;
+import com.sedentarios.valters.ValtersOptions;
 
 public class ObjectCar extends ValtersObject {
 
@@ -28,7 +29,7 @@ public class ObjectCar extends ValtersObject {
 
 	@Override
 	public void create() {
-		carAtlas = new TextureAtlas("assets/Anim/carro/carro.txt");
+		carAtlas = new TextureAtlas("assets/anim/carro/carro.txt");
 	
 		frames = new TextureRegion[24];
 		
@@ -38,8 +39,8 @@ public class ObjectCar extends ValtersObject {
 			frames[i-1] = carFrame;
 		}
 		
-		horn = Gdx.audio.newSound(Gdx.files.internal("assets/Sounds/busina.mp3"));
-		car = Gdx.audio.newSound(Gdx.files.internal("assets/Sounds/car_driving_by.wav"));
+		horn = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/busina.mp3"));
+		car = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/car_driving_by.wav"));
 	}
 
 	@Override
@@ -77,12 +78,12 @@ public class ObjectCar extends ValtersObject {
 		
 		
 		if(timeLeftToPlayer() <= 1.5f && !playedCarSound){
-			car.play(0.8f);
+			car.play(0.8f  * ValtersOptions.SOUND_LEVEL);
 			playedCarSound = true;
 		}
 		
 		if(ValtersGame.valter.getCenteredPosition().dst(position) <= 350 && !playedHorn){
-			horn.play(1f);
+			horn.play(ValtersOptions.SOUND_LEVEL);
 			playedHorn = true;
 		}
 		

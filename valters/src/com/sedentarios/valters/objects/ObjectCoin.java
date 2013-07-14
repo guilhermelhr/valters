@@ -1,5 +1,6 @@
 package com.sedentarios.valters.objects;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.sedentarios.valters.ValtersGame;
+import com.sedentarios.valters.ValtersOptions;
 
 public class ObjectCoin extends ValtersObject{
 
@@ -20,19 +22,25 @@ public class ObjectCoin extends ValtersObject{
 	private Sound pickupSound;
 
 	public ObjectCoin(float x, float y) {
-		super("Coin", x, y, (byte) 2, true, true);
+		super("Coin", x, y, (byte) 1, true, true);
 	}
 
 	public ObjectCoin(float x, float y, float scale){
 		this(x, y);
 		this.scale = scale;
 	}
+	
+	public static void loadResources(AssetManager assetManager){
+		assetManager.load("assets/sounds/smw_coin.wav", Sound.class);
+		assetManager.load("assets/anim/moeda/moeda.txt", TextureAtlas.class);
+		
+	}
 
 	@Override
 	public void create(){
-		pickupSound = getMap().assetManager.get("assets/Sounds/smw_coin.wav", Sound.class);
+		pickupSound = getMap().assetManager.get("assets/sounds/smw_coin.wav", Sound.class);
 
-		atlas = getMap().assetManager.get("assets/Anim/moeda/moeda.txt", TextureAtlas.class).getRegions();
+		atlas = getMap().assetManager.get("assets/anim/moeda/moeda.txt", TextureAtlas.class).getRegions();
 		frames = new Array<TextureRegion>();
 		for(int i = 0; i < atlas.size; i++) {
 			TextureRegion region = atlas.get(i);
@@ -50,7 +58,7 @@ public class ObjectCoin extends ValtersObject{
 	public void onCollision(CollisionComponent other){
 		super.onCollision(other);
 		if(other.getOwner().getName().equalsIgnoreCase("valter") && !collected){
-			pickupSound.play();
+			pickupSound.play(ValtersOptions.SOUND_LEVEL);
 			collected = true;
 			requestDeath();
 		}

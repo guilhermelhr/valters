@@ -12,6 +12,7 @@ public class ControllerWrapper {
 	private static HashMap<String, Integer> axisToInput = new HashMap<String, Integer>();
 	private static HashMap<String, Float> inputDelay = new HashMap<String, Float>();
 	private static HashMap<String, Float> delay = new HashMap<String, Float>();
+	private static Array<String> disabled = new Array<String>();
 
 
 	public static enum Controller{
@@ -57,8 +58,26 @@ public class ControllerWrapper {
 		while(axisToInput.remove(in)!=null);
 	}
 	
-	public static boolean isInputActive(String in) {
-		if(!delay.containsKey(in)){
+	public static boolean isInputActive(String in){
+		return isInputActive(in, true);
+	}
+	
+	public static void disableInput(String in){
+		if(!disabled.contains(in, false)){
+			disabled.add(in);
+		}
+	}
+	
+	public static void enableInput(String in){
+		disabled.removeValue(in, false);
+	}
+	
+	public static void enableAllInputs(){
+		disabled.clear();
+	}
+	
+	public static boolean isInputActive(String in, boolean checkDelay) {
+		if(!disabled.contains(in, false) && (!checkDelay || !delay.containsKey(in))){
 			if(ValtersGame.controller != null){
 				for(Entry<String, Integer> s : axisToInput.entrySet()){
 					if(s.getKey().equalsIgnoreCase(in)){

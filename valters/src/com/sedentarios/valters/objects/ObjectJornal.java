@@ -1,6 +1,5 @@
 package com.sedentarios.valters.objects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -8,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.sedentarios.valters.ControllerWrapper;
 import com.sedentarios.valters.ValtersGame;
+import com.sedentarios.valters.ValtersOptions;
 
 public class ObjectJornal extends ValtersObject {
 
@@ -23,9 +23,9 @@ public class ObjectJornal extends ValtersObject {
 
 	@Override
 	public void create() {
-		pickupSound = Gdx.audio.newSound(Gdx.files.internal("assets/Sounds/pickup.wav"));
-		jornal = new Texture("assets/Texturas/jornal.png");
-		sprite = new Texture("assets/Objs/jornal.png");
+		pickupSound = getMap().assetManager.get("assets/sounds/pickup.wav", Sound.class);
+		jornal = getMap().assetManager.get("assets/texturas/jornal.png");
+		sprite = getMap().assetManager.get("assets/objs/jornal.png");
 		sprite.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		setSize(sprite.getWidth() * scale, sprite.getHeight() * scale);
 		super.create();
@@ -34,9 +34,6 @@ public class ObjectJornal extends ValtersObject {
 	@Override
 	public void dispose() {
 		super.dispose();
-		sprite.dispose();
-		jornal.dispose();
-		pickupSound.dispose();
 	}
 	
 	@Override
@@ -60,7 +57,7 @@ public class ObjectJornal extends ValtersObject {
 	@Override
 	public void postObjectsRender(SpriteBatch batch){
 		if(picked) {
-			batch.draw(jornal, ValtersGame.camera.position.x - jornal.getWidth() / 2, 0);
+			batch.draw(jornal, ValtersGame.getCamPosition().x - jornal.getWidth() / 2, 0);
 			if(ControllerWrapper.isInputActive("action")){
 				requestDeath();
                 ValtersGame.valter.setEnabled(true);
@@ -76,7 +73,7 @@ public class ObjectJornal extends ValtersObject {
 	@Override
 	public void onCollision(CollisionComponent other){
 		if(!picked && other.getOwner().getName().equals("valter")){
-			pickupSound.play();
+			pickupSound.play(ValtersOptions.SOUND_LEVEL);
 			//this.requestDeath();
 			picked = true;
             other.getOwner().setEnabled(false);

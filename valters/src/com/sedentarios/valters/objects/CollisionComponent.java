@@ -1,6 +1,7 @@
 package com.sedentarios.valters.objects;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 public class CollisionComponent {
 
@@ -8,6 +9,7 @@ public class CollisionComponent {
 	private Rectangle rect;
 	private boolean active = true;
 	private boolean isOnlyTrigger = false;
+	public Array<String> ignore;
 	
 	public CollisionComponent(Rectangle rect){
 		this(rect, false);
@@ -16,6 +18,7 @@ public class CollisionComponent {
 	public CollisionComponent(Rectangle rect, boolean isOnlyTrigger) {
 		this.rect = rect;
 		this.isOnlyTrigger = isOnlyTrigger;
+		ignore = new Array<String>();
 	}
 	
 	public boolean isActive() {
@@ -40,7 +43,9 @@ public class CollisionComponent {
 	
 	public boolean collidesWith(CollisionComponent component){
 		if(!component.getOwner().equals(object) && object.isEnabled() && rect.overlaps(component.rect)){
-			return true;
+			if(!ignore.contains(component.getOwner().getName(), false)){
+				return true;
+			}
 		}
 		
 		return false;

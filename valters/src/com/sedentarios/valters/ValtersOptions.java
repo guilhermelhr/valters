@@ -1,11 +1,12 @@
 package com.sedentarios.valters;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Guilherme
- * Date: 15/06/13
- * Time: 12:05
- * To change this template use File | Settings | File Templates.
- */
 public class ValtersOptions {
+	public static final int SCREEN_HEIGHT = 720;
+	public static float SCREEN_RATIO = 16/9f;
+	public static int SCREEN_WIDTH = (int) (SCREEN_HEIGHT * SCREEN_RATIO);
+	public static final int SCREEN_BASE_WIDTH = SCREEN_WIDTH;
+	public static boolean LIMITE_HORIZONTAL = true;
+
+	public static float SOUND_LEVEL = 1f;
+	public static float MUSIC_LEVEL = 1f;
 }
